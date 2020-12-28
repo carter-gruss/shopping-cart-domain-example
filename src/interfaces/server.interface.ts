@@ -8,4 +8,11 @@ export type ServerMiddleware = RequestHandler;
 export interface ServerController {
   router: Router;
   path: string;
+
+  /**
+   * Initialize all API routes associated with controller
+   */
+  initRoutes(): void;
 }
+
+export type Controller = {new (): ServerController};

@@ -1,5 +1,8 @@
+import 'reflect-metadata';
 import {AppServer} from './app';
 import * as dotenv from 'dotenv';
+import {ProduceController} from './produce/produce.controller';
+import bodyParser = require('body-parser');
 
 dotenv.config();
 
@@ -16,8 +19,8 @@ async function bootstrap() {
   const app = new AppServer({
     port: Number(port),
     environment: env,
-    controllers: [],
-    middleware: [],
+    controllers: [ProduceController],
+    middleware: [bodyParser.json()],
   });
 
   app.listen();

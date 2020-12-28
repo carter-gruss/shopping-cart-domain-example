@@ -2,22 +2,25 @@ import {Application} from 'express';
 import * as express from 'express';
 import {
   ALL_ENVIRONMENTS,
+  Controller,
   Environment,
   ServerController,
   ServerMiddleware,
 } from './interfaces';
+import {container} from 'tsyringe';
 
 interface AppParams {
   port: number;
   environment: string;
   middleware: ServerMiddleware[];
-  controllers: ServerController[];
+  controllers: Controller[];
 }
 
 export class AppServer {
   public app: Application;
   public port: number;
   public env: Environment;
+  private _apiPath = '/api';
 
   constructor(params: AppParams) {
     try {
@@ -34,7 +37,7 @@ export class AppServer {
       this.env = params.environment;
 
       this._initMiddleware(params.middleware);
-      this._initRouteControllers(params.controllers);
+      this._initRouteControllers(`${this._apiPath}`, params.controllers);
     } catch (error) {
       console.log(error);
       throw error;
@@ -47,9 +50,13 @@ export class AppServer {
     });
   }
 
-  private _initRouteControllers(controllers: ServerController[]): void {
+  private _initRouteControllers(
+    path = this._apiPath,
+    controllers: Controller[]
+  ): void {
     controllers.forEach(controller => {
-      this.app.use('/', controller.router);
+      const apiControllerInstance = container.resolve(controller);
+      this.app.use(`${path}`, apiControllerInstance.router);
     });
   }
 
