@@ -4,7 +4,6 @@ import {
   ALL_ENVIRONMENTS,
   Controller,
   Environment,
-  ServerController,
   ServerMiddleware,
 } from './interfaces';
 import {container} from 'tsyringe';

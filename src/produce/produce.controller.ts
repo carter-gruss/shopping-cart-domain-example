@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response, Router} from 'express';
-import {injectable, singleton} from 'tsyringe';
+import {singleton} from 'tsyringe';
 import {ServerController} from '../interfaces';
 
 // ----------------------------------------
@@ -11,7 +11,7 @@ import {ServerController} from '../interfaces';
 // ---
 //  Monday, December 28 2020
 // ----------------------------------------
-@injectable()
+@singleton()
 export class ProduceController implements ServerController {
   router: Router = Router();
   path = '/produce';
