@@ -7,9 +7,16 @@ interface Datum {
 }
 
 describe('InMemoryRepository', () => {
+  // ----------------------------------------------------------------------------
+  // Setup
+  // ----------------------------------------------------------------------------
   let repository: InMemoryRepository<Datum>;
 
   beforeEach(async () => {
+    repository = new InMemoryRepository([]);
+  });
+
+  afterEach(async () => {
     repository = new InMemoryRepository([]);
   });
 
