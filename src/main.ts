@@ -3,6 +3,7 @@ import {AppServer} from './app';
 import * as dotenv from 'dotenv';
 import {ProduceController} from './produce/produce.controller';
 import bodyParser = require('body-parser');
+import {logHandler} from './common/logger.middleware';
 
 dotenv.config();
 
@@ -20,7 +21,7 @@ async function bootstrap() {
     port: Number(port),
     environment: env,
     controllers: [ProduceController],
-    middleware: [bodyParser.json()],
+    middleware: [bodyParser.json(), logHandler],
   });
 
   app.listen();

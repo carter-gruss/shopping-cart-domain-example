@@ -11,14 +11,12 @@ import {ServerController} from '../interfaces';
 // ---
 //  Monday, December 28 2020
 // ----------------------------------------
-@singleton()
+@injectable()
 export class ProduceController implements ServerController {
   router: Router = Router();
-  path = 'produce';
+  path = '/produce';
 
   constructor() {
-    console.log(`Creating new controller on ${this.path}`);
-
     this.initRoutes();
   }
 
@@ -30,7 +28,6 @@ export class ProduceController implements ServerController {
 
   findAllProduce(req: Request, res: Response, next: NextFunction): void {
     try {
-      console.log('Calling findAllProduce');
       console.log(req);
 
       res.status(200).send();
@@ -45,8 +42,6 @@ export class ProduceController implements ServerController {
     next: NextFunction
   ): Promise<void> {
     try {
-      console.log('Calling findProduceById');
-
       res.status(200).send({
         data: 'Hizzah',
       });
