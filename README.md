@@ -74,4 +74,35 @@ The NestJS framework refers to these groupings as "modules, " which form the bas
 >
 > [NestJS Documentation](https://docs.nestjs.com/modules#modules)
 
+Within a `Produce` module, to take an example from this project, everything related to the given "Produce" domain would be located within the same directory. Here is how that structure would look: 
+
+``` 
+
+produce/
+├── dto
+│   ├── create-produce.dto.ts
+│   └── update-produce.dto.ts
+├── interfaces
+│   └── produce.interface.ts
+├── produce.controller.spec.ts
+├── produce.controller.ts
+├── produce.service.spec.ts
+└── produce.service.ts
+```
+
+* `dto/`: Defines data-transfer interfaces, or the shape of data transfered between the client and the API. Note that DTOs do not contain any logic; they purely model state. NestJS prefers to implent DTO "interfaces" via the class keyword as such: 
+
+``` typescript
+export class CreateProduceDto {
+  readonly name: string;
+  readonly cost: number;
+  readonly type: 'fruit' | 'vegitable';
+}
+```
+
+* `interfaces/`: Contains definitions of objects internal to the back-end implementation; this includes interfaces for Data Access Objects, Repositories, and Domain "Value" models. Interfaces in this folder are meant to be simple, straightforward, and reinforce [SOLID](https://en.wikipedia.org/wiki/SOLID) principles. 
+* `produce.controller.ts`: Should be responsible for handling incoming produce requests and returning responses to the client. A controller should be "dumb, " meaning it does not have any "business" logic incorporated; business logic belongs in the service.
+* `produce.service.ts`: A service file provides the core logic of a feature. Often a service is divided into multiple services, each handling a separate core responsibility. For instance, the responsibility of fetching data from a database may belong to a `ProduceRepository` service, while the work of re-stocking fresh produce may belong to a `ProduceRestocking` service.
+* `**/*.spec.ts`: The spec files found within the `produce/` directory are soley responsible for testing Produce functionality. The use of the "spec" keyword helps identifies these tests as "unit tests, " as opposed to end-to-end tests (e2e) which are often located at the root level in a `__tests__` folder.
+
 ### NestJS & Domain-Driven Development
