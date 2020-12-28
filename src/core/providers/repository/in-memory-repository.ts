@@ -92,7 +92,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     });
   }
 
-  findByOrFail<Prop extends keyof Entity>(
+  async findByOrFail<Prop extends keyof Entity>(
     property: Prop,
     value: Entity[Prop]
   ): Promise<Entity> {
@@ -112,7 +112,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     });
   }
 
-  findEntitiesBy<Prop extends keyof Entity>(
+  async findEntitiesBy<Prop extends keyof Entity>(
     property: Prop,
     value: Entity[Prop]
   ): Promise<Entity[]> {
@@ -126,7 +126,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     });
   }
 
-  addEntity(entity: Entity): Promise<Entity | null> {
+  async addEntity(entity: Entity): Promise<Entity | null> {
     let length = this._inMemoryRepository.length;
     return new Promise(resolve => {
       entity.id = length++;
@@ -174,7 +174,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     });
   }
 
-  dropAllEntities(): Promise<DeleteDataResult> {
+  async dropAllEntities(): Promise<DeleteDataResult> {
     return new Promise(resolve => {
       const count = this._inMemoryRepository.length;
       this._inMemoryRepository = [];
@@ -185,7 +185,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     });
   }
 
-  private _findBy<Prop extends ObjectKeyOf<Entity>>(
+  private async _findBy<Prop extends ObjectKeyOf<Entity>>(
     property: Prop,
     value: Entity[Prop]
   ): Promise<Entity | null> {
@@ -199,7 +199,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     });
   }
 
-  private _findIndexBy<Prop extends ObjectKeyOf<Entity>>(
+  private async _findIndexBy<Prop extends ObjectKeyOf<Entity>>(
     property: Prop,
     value: Entity[Prop]
   ): Promise<number> {
