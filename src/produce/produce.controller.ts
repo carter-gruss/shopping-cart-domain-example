@@ -28,9 +28,7 @@ export class ProduceController implements ServerController {
 
   findAllProduce(req: Request, res: Response, next: NextFunction): void {
     try {
-      console.log(req);
-
-      res.status(200).send();
+      res.status(200).send({data: 'Hizzah'});
     } catch (error) {
       next(error);
     }
