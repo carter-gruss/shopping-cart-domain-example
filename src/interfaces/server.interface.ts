@@ -15,4 +15,4 @@ export interface ServerController {
   initRoutes(): void;
 }
 
-export type Controller = {new (): ServerController};
+export type Controller = {new (...args: any): ServerController};

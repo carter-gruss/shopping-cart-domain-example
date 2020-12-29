@@ -4,6 +4,8 @@ import * as dotenv from 'dotenv';
 import {ProduceController} from './produce/produce.controller';
 import bodyParser = require('body-parser');
 import {logHandler} from './common/logger.middleware';
+import {container} from 'tsyringe';
+import {ProduceServiceImpl} from './produce/produce.service';
 
 dotenv.config();
 
@@ -16,6 +18,10 @@ dotenv.config();
 async function bootstrap() {
   const port = process.env.PORT || 8000;
   const env = process.env.NODE_ENV || 'development';
+
+  container.register('ProduceService', {
+    useClass: ProduceServiceImpl,
+  });
 
   const app = new AppServer({
     port: Number(port),

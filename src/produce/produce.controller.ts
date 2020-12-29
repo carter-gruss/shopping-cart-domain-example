@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response, Router} from 'express';
-import {singleton} from 'tsyringe';
+import {inject, singleton} from 'tsyringe';
 import {ServerController} from '../interfaces';
+import {ProduceService} from './produce.service';
 
 // ----------------------------------------
 //  Produce API: Controller for accessing fresh produce
@@ -16,7 +17,9 @@ export class ProduceController implements ServerController {
   router: Router = Router();
   path = '/produce';
 
-  constructor() {
+  constructor(
+    @inject('ProduceService') private _produceService: ProduceService
+  ) {
     this.initRoutes();
   }
 
@@ -28,6 +31,7 @@ export class ProduceController implements ServerController {
 
   findAllProduce(req: Request, res: Response, next: NextFunction): void {
     try {
+      const produce = this._produceService.findAllFruit();
       res.status(200).send({data: 'Hizzah'});
     } catch (error) {
       next(error);

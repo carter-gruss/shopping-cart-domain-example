@@ -1,6 +1,7 @@
+import {injectable} from 'tsyringe';
 import {Produce} from './interfaces';
 
-interface ProduceService {
+export interface ProduceService {
   /**
    * Return all produce with a ProduceType matching `Fruit`.
    */
@@ -17,6 +18,7 @@ interface ProduceService {
   findFruitByName(): Promise<Produce>;
 }
 
+@injectable()
 export class ProduceServiceImpl implements ProduceService {
   constructor() {}
 
