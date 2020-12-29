@@ -8,7 +8,12 @@ interface Datum {
 
 const EMPTY_MOCK_DATA: Datum[] = [];
 const MOCK_DATA_WITH_ONE_ENTITY: Datum[] = [{id: 0, value: 'MOCK DATA'}];
-const MOCK_DATA_ARRAY: Datum[] = [{id: 0, value: 'MOCK DATA'}, {id: 1, value: 'MOCK DATA 1'}, {id: 2, value: 'MOCK DATA 2'}, {id: 3, value: 'MOCK DATA 3'}];
+const MOCK_DATA_ARRAY: Datum[] = [
+  {id: 0, value: 'MOCK DATA'},
+  {id: 1, value: 'MOCK DATA 1'},
+  {id: 2, value: 'MOCK DATA 2'},
+  {id: 3, value: 'MOCK DATA 3'},
+];
 
 describe('InMemoryRepository', () => {
   // ----------------------------------------------------------------------------
@@ -34,7 +39,7 @@ describe('InMemoryRepository', () => {
 
       const entities = await repository.findAll();
       expect(entities).toBeInstanceOf(Array);
-      expect(entities).toBe(testData);
+      expect(entities[0]).toEqual(testData[0]);
     });
 
     it('should return an array when one entity is available', async () => {
@@ -49,7 +54,7 @@ describe('InMemoryRepository', () => {
 
       const entities = await repository.findAll();
       expect(entities).toBeInstanceOf(Array);
-      expect(entities).toBe(testData);
+      expect(entities[0]).toEqual(testData[0]);
     });
   });
 
@@ -128,7 +133,7 @@ describe('InMemoryRepository', () => {
       expect(entity?.value).toBe(data?.value);
     });
 
-    it('should throw a DataNotFound error when no id matches', async () => {
+    it('should throw a DataNotFoundException error when no id matches', async () => {
       repository = new InMemoryRepository(EMPTY_MOCK_DATA);
 
       try {
@@ -144,31 +149,137 @@ describe('InMemoryRepository', () => {
   // ----------------------------------------------------------------------------
   describe('addEntity', () => {
     it('should return a newly created entity added to the system', async () => {
+      const COPY_OF_MOCK_DATA = [...EMPTY_MOCK_DATA];
+
       const newEntity: Datum = {
         id: 10,
         value: 'NEW TEST',
       };
 
-      repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
 
       const result = await repository.addEntity(newEntity);
       expect(result).toBeDefined();
       expect(result?.id).toEqual(newEntity.id);
+      expect(result?.value).toEqual(newEntity.value);
+    });
+
+    it('should be able to add a new entity to an existing array of entities', async () => {
+      const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
+
+      const newEntity: Datum = {
+        id: 10,
+        value: 'NEW TEST',
+      };
+
+      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+
+      const result = await repository.addEntity(newEntity);
+      expect(result).toBeDefined();
+      expect(result?.id).toEqual(newEntity.id);
+      expect(result?.value).toEqual(newEntity.value);
     });
   });
 
   // ----------------------------------------------------------------------------
   // Update Entity
   // ----------------------------------------------------------------------------
-  describe('updateEntity', () => {});
+  describe('updateEntity', () => {
+    it('should be able to update an existing entity from an array of entities', async () => {
+      const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
+
+      const entityToUpdate = COPY_OF_MOCK_DATA[0];
+      const UPDATED_VALUE = 'UPDATED!!!';
+      const updatedEntity = Object.assign({}, entityToUpdate, {
+        value: UPDATED_VALUE,
+      });
+      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+
+      const result = await repository.updateEntity(
+        entityToUpdate?.id,
+        updatedEntity
+      );
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(updatedEntity.id);
+      expect(result?.value).toBe(UPDATED_VALUE);
+    });
+
+    it('should be able to insert a new entity to an array of entities', async () => {
+      const lastEntity = MOCK_DATA_ARRAY[MOCK_DATA_ARRAY.length - 1];
+      const newEntityId = lastEntity.id + 1;
+      const NEWLY_ADDED_VALUE = 'JUST ADDED';
+      const newEntity = {
+        id: newEntityId,
+        value: NEWLY_ADDED_VALUE,
+      };
+
+      repository = new InMemoryRepository(MOCK_DATA_ARRAY);
+
+      const result = await repository.updateEntity(newEntityId, newEntity);
+      expect(result).toBeDefined();
+      expect(result?.value).toBe(NEWLY_ADDED_VALUE);
+    });
+  });
 
   // ----------------------------------------------------------------------------
   // Delete Entity
   // ----------------------------------------------------------------------------
-  describe('deleteEntity', () => {});
+  describe('deleteEntity', () => {
+    it('should throw an DataNotFoundException if no entity can be deleted', async () => {
+      repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+
+      try {
+        repository.deleteEntity(3);
+      } catch (error) {
+        expect(error).toBeDefined();
+        expect(error).toEqual(DataNotFoundException);
+      }
+    });
+
+    it('should return a DeleteDataResult when one entity is deleted', async () => {
+      const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
+      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+
+      const result = await repository.deleteEntity(2);
+      expect(result).toBeDefined();
+      expect(result.affected).toBe(1);
+      expect(result.status).toBe('success');
+    });
+
+    it('should reduce the length of the dataset when one entity is deleted', async () => {
+      const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
+      const initialLengthOfData = COPY_OF_MOCK_DATA.length;
+      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      const result = await repository.deleteEntity(2);
+
+      const internalArr = repository['_inMemoryRepository'].length;
+
+      expect(result.status).toBe('success');
+      expect(internalArr).toBeLessThan(initialLengthOfData);
+    });
+  });
 
   // ----------------------------------------------------------------------------
   // Drop All Entities
   // ----------------------------------------------------------------------------
-  describe('dropAllEntities', () => {});
+  describe('dropAllEntities', () => {
+    it('should drop regardless of whether the dataset is empty', async () => {
+      repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+      const result = await repository.dropAllEntities();
+      expect(result.affected).toBe(0);
+      expect(result.status).toBe('success');
+    });
+
+    it('should drop all entities from the existing dataset', async () => {
+      const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
+
+      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      const result = await repository.dropAllEntities();
+      const internalArr = repository['_inMemoryRepository'].length;
+
+      expect(result.affected).toBe(COPY_OF_MOCK_DATA.length);
+      expect(result.status).toBe('success');
+      expect(internalArr).toBe(0);
+    });
+  });
 });

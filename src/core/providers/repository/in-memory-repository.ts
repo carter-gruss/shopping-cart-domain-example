@@ -73,7 +73,7 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
   private _inMemoryRepository: Entity[] = [];
 
   constructor(entities: Entity[]) {
-    this._inMemoryRepository = entities;
+    this._inMemoryRepository = entities.slice(0);
   }
 
   findAll(): Promise<Entity[]> {
@@ -161,11 +161,11 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
 
       if (indexToDelete === -1) {
         throw new DataNotFoundException(
-          `Entity with an matching ${id} does not exist.`
+          `Entity with an matching id ${id} does not exist.`
         );
       }
 
-      this._inMemoryRepository.splice(1, indexToDelete);
+      this._inMemoryRepository.splice(indexToDelete, 1);
 
       resolve({
         affected: 1,
