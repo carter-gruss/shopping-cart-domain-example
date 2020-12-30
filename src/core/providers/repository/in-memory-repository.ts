@@ -12,12 +12,12 @@ interface DataAccessObject<T> {
   /**
    * Returns an array of all entities in the system
    */
-  findAll(): Promise<T[]>;
+  findAllEntities(): Promise<T[]>;
 
   /**
    * Find a single entity by a property
    */
-  findBy<Prop extends ObjectKeyOf<T>>(
+  findEntityBy<Prop extends ObjectKeyOf<T>>(
     property: Prop,
     value: T[Prop]
   ): Promise<T | null>;
@@ -65,10 +65,14 @@ interface AbstractEntityObject {
   id: number | string;
 }
 
+export interface InMemoryRepository<Entity extends AbstractEntityObject> {
+  inMemoryStore: InMemoryStore<Entity>;
+}
+
 /**
  *
  */
-export class InMemoryRepository<Entity extends AbstractEntityObject>
+export class InMemoryStore<Entity extends AbstractEntityObject>
   implements DataAccessObject<Entity> {
   private _inMemoryRepository: Entity[] = [];
 
@@ -76,13 +80,13 @@ export class InMemoryRepository<Entity extends AbstractEntityObject>
     this._inMemoryRepository = entities.slice(0);
   }
 
-  findAll(): Promise<Entity[]> {
+  async findAllEntities(): Promise<Entity[]> {
     return new Promise(resolve => {
       resolve(this._inMemoryRepository);
     });
   }
 
-  async findBy<Prop extends keyof Entity>(
+  async findEntityBy<Prop extends keyof Entity>(
     property: Prop,
     value: Entity[Prop]
   ): Promise<Entity | null> {

@@ -1,5 +1,5 @@
 import {DataNotFoundException} from '../../../common/exceptions/data-not-found.exception';
-import {InMemoryRepository} from './in-memory-repository';
+import {InMemoryStore} from './in-memory-repository';
 
 interface Datum {
   id: number;
@@ -19,10 +19,10 @@ describe('InMemoryRepository', () => {
   // ----------------------------------------------------------------------------
   // Setup
   // ----------------------------------------------------------------------------
-  let repository: InMemoryRepository<Datum>;
+  let repository: InMemoryStore<Datum>;
 
   beforeEach(async () => {
-    repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+    repository = new InMemoryStore(EMPTY_MOCK_DATA);
   });
 
   it('should be defined', () => {
@@ -35,9 +35,9 @@ describe('InMemoryRepository', () => {
   describe('findAll', () => {
     it('should return an array when no entity is available', async () => {
       const testData: Datum[] = EMPTY_MOCK_DATA;
-      repository = new InMemoryRepository(testData);
+      repository = new InMemoryStore(testData);
 
-      const entities = await repository.findAll();
+      const entities = await repository.findAllEntities();
       expect(entities).toBeInstanceOf(Array);
       expect(entities[0]).toEqual(testData[0]);
     });
@@ -50,9 +50,9 @@ describe('InMemoryRepository', () => {
         },
       ];
 
-      repository = new InMemoryRepository(testData);
+      repository = new InMemoryStore(testData);
 
-      const entities = await repository.findAll();
+      const entities = await repository.findAllEntities();
       expect(entities).toBeInstanceOf(Array);
       expect(entities[0]).toEqual(testData[0]);
     });
@@ -68,9 +68,9 @@ describe('InMemoryRepository', () => {
         value: 'TEST',
       };
 
-      repository = new InMemoryRepository([data]);
+      repository = new InMemoryStore([data]);
 
-      const entity = await repository.findBy('id', 2);
+      const entity = await repository.findEntityBy('id', 2);
       expect(entity).toBeDefined();
       expect(entity?.id).toBe(2);
       expect(entity?.value).toBe(data?.value);
@@ -83,13 +83,13 @@ describe('InMemoryRepository', () => {
         value: valueToFindBy,
       };
 
-      repository = new InMemoryRepository([
+      repository = new InMemoryStore([
         {id: 1, value: 'TEST 1'},
         expected,
         {id: 3, value: 'TEST 3'},
       ]);
 
-      const entity = await repository.findBy('value', valueToFindBy);
+      const entity = await repository.findEntityBy('value', valueToFindBy);
 
       expect(entity).toBeDefined();
       expect(entity?.id).toBe(2);
@@ -108,7 +108,7 @@ describe('InMemoryRepository', () => {
         value: 'TEST',
       };
 
-      repository = new InMemoryRepository([...MOCK_DATA_ARRAY, data]);
+      repository = new InMemoryStore([...MOCK_DATA_ARRAY, data]);
 
       const entity = await repository.findByOrFail('id', idToFindBy);
       expect(entity).toBeDefined();
@@ -124,7 +124,7 @@ describe('InMemoryRepository', () => {
         value: valueToFindBy,
       };
 
-      repository = new InMemoryRepository([data]);
+      repository = new InMemoryStore([data]);
 
       const entity = await repository.findByOrFail('value', valueToFindBy);
 
@@ -134,7 +134,7 @@ describe('InMemoryRepository', () => {
     });
 
     it('should throw a DataNotFoundException error when no id matches', async () => {
-      repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+      repository = new InMemoryStore(EMPTY_MOCK_DATA);
 
       try {
         repository.findByOrFail('id', 5);
@@ -156,7 +156,7 @@ describe('InMemoryRepository', () => {
         value: 'NEW TEST',
       };
 
-      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      repository = new InMemoryStore(COPY_OF_MOCK_DATA);
 
       const result = await repository.addEntity(newEntity);
       expect(result).toBeDefined();
@@ -172,7 +172,7 @@ describe('InMemoryRepository', () => {
         value: 'NEW TEST',
       };
 
-      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      repository = new InMemoryStore(COPY_OF_MOCK_DATA);
 
       const result = await repository.addEntity(newEntity);
       expect(result).toBeDefined();
@@ -193,7 +193,7 @@ describe('InMemoryRepository', () => {
       const updatedEntity = Object.assign({}, entityToUpdate, {
         value: UPDATED_VALUE,
       });
-      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      repository = new InMemoryStore(COPY_OF_MOCK_DATA);
 
       const result = await repository.updateEntity(
         entityToUpdate?.id,
@@ -213,7 +213,7 @@ describe('InMemoryRepository', () => {
         value: NEWLY_ADDED_VALUE,
       };
 
-      repository = new InMemoryRepository(MOCK_DATA_ARRAY);
+      repository = new InMemoryStore(MOCK_DATA_ARRAY);
 
       const result = await repository.updateEntity(newEntityId, newEntity);
       expect(result).toBeDefined();
@@ -226,7 +226,7 @@ describe('InMemoryRepository', () => {
   // ----------------------------------------------------------------------------
   describe('deleteEntity', () => {
     it('should throw an DataNotFoundException if no entity can be deleted', async () => {
-      repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+      repository = new InMemoryStore(EMPTY_MOCK_DATA);
 
       try {
         repository.deleteEntity(3);
@@ -238,7 +238,7 @@ describe('InMemoryRepository', () => {
 
     it('should return a DeleteDataResult when one entity is deleted', async () => {
       const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
-      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      repository = new InMemoryStore(COPY_OF_MOCK_DATA);
 
       const result = await repository.deleteEntity(2);
       expect(result).toBeDefined();
@@ -249,7 +249,7 @@ describe('InMemoryRepository', () => {
     it('should reduce the length of the dataset when one entity is deleted', async () => {
       const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
       const initialLengthOfData = COPY_OF_MOCK_DATA.length;
-      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      repository = new InMemoryStore(COPY_OF_MOCK_DATA);
       const result = await repository.deleteEntity(2);
 
       const internalArr = repository['_inMemoryRepository'].length;
@@ -264,7 +264,7 @@ describe('InMemoryRepository', () => {
   // ----------------------------------------------------------------------------
   describe('dropAllEntities', () => {
     it('should drop regardless of whether the dataset is empty', async () => {
-      repository = new InMemoryRepository(EMPTY_MOCK_DATA);
+      repository = new InMemoryStore(EMPTY_MOCK_DATA);
       const result = await repository.dropAllEntities();
       expect(result.affected).toBe(0);
       expect(result.status).toBe('success');
@@ -273,7 +273,7 @@ describe('InMemoryRepository', () => {
     it('should drop all entities from the existing dataset', async () => {
       const COPY_OF_MOCK_DATA = [...MOCK_DATA_ARRAY];
 
-      repository = new InMemoryRepository(COPY_OF_MOCK_DATA);
+      repository = new InMemoryStore(COPY_OF_MOCK_DATA);
       const result = await repository.dropAllEntities();
       const internalArr = repository['_inMemoryRepository'].length;
 
