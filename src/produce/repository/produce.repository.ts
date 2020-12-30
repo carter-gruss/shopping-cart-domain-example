@@ -1,16 +1,21 @@
+import {injectable} from 'tsyringe';
 import {
   InMemoryRepository,
   InMemoryStore,
 } from '../../core/providers/repository/in-memory-repository';
 import {ProduceType} from '../interfaces';
+import {MOCK_PRODUCE} from '../mock/produce.mock';
 import {ProduceEntity} from '../produce.entity';
-import {ProduceDAO} from './produce-dao.interface';
+import {ProduceRepository} from './produce-dao.interface';
 
+@injectable()
 export class ProduceInMemoryRepository
-  implements InMemoryRepository<ProduceEntity>, ProduceDAO<ProduceEntity> {
+  implements
+    InMemoryRepository<ProduceEntity>,
+    ProduceRepository<ProduceEntity> {
   inMemoryStore: InMemoryStore<ProduceEntity>;
 
-  constructor(entities: ProduceEntity[]) {
+  constructor(entities: ProduceEntity[] = MOCK_PRODUCE) {
     this.inMemoryStore = new InMemoryStore<ProduceEntity>(entities);
   }
 

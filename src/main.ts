@@ -19,10 +19,6 @@ async function bootstrap() {
   const port = process.env.PORT || 8000;
   const env = process.env.NODE_ENV || 'development';
 
-  container.register('ProduceService', {
-    useClass: ProduceServiceImpl,
-  });
-
   const app = new AppServer({
     port: Number(port),
     environment: env,

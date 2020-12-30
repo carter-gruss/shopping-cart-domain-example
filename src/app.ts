@@ -7,6 +7,7 @@ import {
   ServerMiddleware,
 } from './interfaces';
 import {container} from 'tsyringe';
+import createAppContainer from './core/app-container';
 
 interface AppParams {
   port: number;
@@ -23,6 +24,9 @@ export class AppServer {
 
   constructor(params: AppParams) {
     try {
+      // Bootstrap the app by first registering all dependencies.
+      createAppContainer();
+
       this.app = express();
       this.port = params.port;
 

@@ -1,5 +1,7 @@
-import {injectable} from 'tsyringe';
+import {inject, injectable} from 'tsyringe';
 import {Produce} from './interfaces';
+import {ProduceEntity} from './produce.entity';
+import {ProduceRepository} from './repository/produce-dao.interface';
 
 export interface ProduceService {
   /**
@@ -15,22 +17,28 @@ export interface ProduceService {
   /**
    * Return a fruit found by its name.
    */
-  findFruitByName(): Promise<Produce>;
+  findFruitByName(fruitName: string): Promise<Produce | null>;
 }
 
 @injectable()
 export class ProduceServiceImpl implements ProduceService {
-  constructor() {}
+  constructor(
+    @inject('ProduceRepository')
+    private _produceRepo: ProduceRepository<ProduceEntity>
+  ) {}
 
   findAllFruit(): Promise<Produce[]> {
-    throw new Error('Method not implemented.');
+    const allFruit = this._produceRepo.findAllByProduceType('Fruit');
+    return allFruit;
   }
 
   findAllVegetables(): Promise<Produce[]> {
-    throw new Error('Method not implemented.');
+    const allVegetables = this._produceRepo.findAllByProduceType('Vegetable');
+    return allVegetables;
   }
 
-  findFruitByName(): Promise<Produce> {
-    throw new Error('Method not implemented.');
+  findFruitByName(name: string): Promise<Produce | null> {
+    const fruit = this._produceRepo.findByName(name);
+    return fruit;
   }
 }
