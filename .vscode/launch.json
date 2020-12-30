@@ -14,6 +14,17 @@
       "cwd": "${workspaceFolder}",
       "protocol": "inspector",
       "outFiles": ["${workspaceFolder}/build/**/*.js"]
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Testing Framework",
+      "skipFiles": ["<node_internals>/**", "<node_modules>/**"],
+      "preLaunchTask": "npm: test:watch",
+      "program": "${workspaceFolder}/src/main.ts",
+      "cwd": "${workspaceFolder}",
+      "protocol": "inspector",
+      "outFiles": ["${workspaceFolder}/build/**/*.js"]
     }
   ]
 }

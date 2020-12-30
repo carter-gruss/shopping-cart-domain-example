@@ -45,3 +45,11 @@ export const MOCK_PRODUCE: ProduceEntity[] = [
     produceType: 'Vegetable',
   },
 ];
+
+export const ALL_MOCK_FRUIT = MOCK_PRODUCE.filter(
+  produce => produce.produceType === 'Fruit'
+);
+
+export const ALL_MOCK_VEGETABLE = MOCK_PRODUCE.filter(
+  produce => produce.produceType === 'Vegetable'
+);

@@ -37,6 +37,14 @@
         "isDefault": true
       },
       "label": "tsc: watch - tsconfig.json"
+    },
+    {
+      "type": "npm",
+      "script": "test:watch",
+      "group": "build",
+      "problemMatcher": [],
+      "label": "npm: test:watch",
+      "detail": "jest --watch"
     }
   ]
 }
